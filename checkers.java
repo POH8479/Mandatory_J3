@@ -3,6 +3,25 @@ import java.awt.Point;
 import java.util.LinkedList;
 import java.util.Queue;
 
+class Board {
+
+}
+
+class Piece {
+
+}
+
+class Position {
+
+}
+
+class Player {
+
+}
+
+class Square {
+
+}
 
 public class checkers {
 	/**
