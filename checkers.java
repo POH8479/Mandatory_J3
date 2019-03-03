@@ -17,16 +17,16 @@ class Piece {
 
 /*
  * The Position class represents position of a Piece on the Game Board.
- * The class stores the position as an x and y coordinate with int values between 0 and 8.
+ * The class stores the position as an x and y coordinate with byte values between 0 and 8.
  * @author Pieter O'Hearn
  */
 class Position {
 	// INSTANCE VARIABLES
-	int x;
-	int y;
+	byte x;
+	byte y;
 
 	// CONSTRUCTOR
-	public Position(int x, int y) throws IllegalArgumentException {
+	public Position(byte x, byte y) throws IllegalArgumentException {
 		// check x and y are not out of bound
 		if(outOfBounds(x, y)) {
 			throw new IllegalArgumentException();
@@ -41,7 +41,7 @@ class Position {
 	 * Checks if a Position is out of bounds
 	 * @return true or false
 	 */
-	private boolean outOfBounds(int xPos, int yPos) {
+	private boolean outOfBounds(byte xPos, byte yPos) {
 		// check that the position is between 0 and 8
 		if(xPos >= 0 && xPos <= 8 && yPos >= 0 && yPos <= 8) {
 			return false;
@@ -57,7 +57,7 @@ class Position {
 	 *
 	 * @throws IllegalArgumentException
 	 */
-	public void update(int x, int y) throws IllegalArgumentException {
+	public void update(byte x, byte y) throws IllegalArgumentException {
 		// check x and y are not out of bound
 		if(outOfBounds(x, y)) {
 			throw new IllegalArgumentException();
