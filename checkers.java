@@ -3,6 +3,10 @@ import java.awt.Point;
 import java.util.LinkedList;
 import java.util.Queue;
 
+class Game {
+
+}
+
 class Board {
 
 }
@@ -11,8 +15,58 @@ class Piece {
 
 }
 
+/*
+ * The Position class represents position of a Piece on the Game Board.
+ * The class stores the position as an x and y coordinate with int values between 0 and 8.
+ * @author Pieter O'Hearn
+ */
 class Position {
+	// INSTANCE VARIABLES
+	int x;
+	int y;
 
+	// CONSTRUCTOR
+	public Position(int x, int y) throws IllegalArgumentException {
+		// check x and y are not out of bound
+		if(outOfBounds(x, y)) {
+			throw new IllegalArgumentException();
+		} else {
+			// set x and y
+			this.x = x;
+			this.y = y;
+		}
+	}
+
+	/**
+	 * Checks if a Position is out of bounds
+	 * @return true or false
+	 */
+	private boolean outOfBounds(int xPos, int yPos) {
+		// check that the position is between 0 and 8
+		if(xPos >= 0 && xPos <= 8 && yPos >= 0 && yPos <= 8) {
+			return false;
+		}
+		// else return true
+		return true;
+	}
+
+	/**
+	 * Updates the x and y coordinates of the Position object
+	 * @param x The x coordinate of the Position
+	 * @param y The y coordinate of the Position
+	 *
+	 * @throws IllegalArgumentException
+	 */
+	public void update(int x, int y) throws IllegalArgumentException {
+		// check x and y are not out of bound
+		if(outOfBounds(x, y)) {
+			throw new IllegalArgumentException();
+		} else {
+			// set x and y
+			this.x = x;
+			this.y = y;
+		}
+	}
 }
 
 class Player {
