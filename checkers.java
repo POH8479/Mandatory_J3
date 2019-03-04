@@ -43,7 +43,7 @@ class Position {
 	 */
 	private boolean outOfBounds(byte xPos, byte yPos) {
 		// check that the position is between 0 and 8
-		if(xPos >= 0 && xPos <= 8 && yPos >= 0 && yPos <= 8) {
+		if(xPos > 0 && xPos <= 8 && yPos > 0 && yPos <= 8) {
 			return false;
 		}
 		// else return true
@@ -69,7 +69,62 @@ class Position {
 	}
 }
 
-class Player {
+/**
+ * The Player class represents a Player in the checkers gameBoard.
+ * A Player has a score and a name.
+ * @author Pieter O'Hearn
+ */
+abstract class Player {
+	// INSTANCE VARIABLES
+	String name;
+	int score;
+
+	// CONSTRUCTOR 1
+	public Player(String playerName) {
+		// set name and initalise score to 0
+		this.name = playerName;
+		score = 0;
+	}
+
+	// CONSTRUCTOR 2
+	public Player() {
+		// set name to NULL and initalise score to 0
+		this.name = null;
+		score = 0;
+	}
+
+	/**
+	 * This method gets the name of the player and returns it as a String
+	 * @return The name of the player
+	 */
+	public String getName() {
+
+	}
+
+	/**
+	 * This method gets the score of the Player object
+	 * @return The score of the player
+	 */
+	 public int getScore() {
+		 // return the score
+		 return this.score;
+	 }
+
+	/**
+	* This is an abstract method that is to be implemented by the children
+	* classes, whitePlayer and blackPlayer.
+	* @param piece
+	* @param pos
+	* @return
+	*/
+	public abstract boolean move(Piece piece, Position pos);
+}
+
+class whitePlayer extends Player {
+
+}
+
+class blackPlayer extends Player {
 
 }
 
