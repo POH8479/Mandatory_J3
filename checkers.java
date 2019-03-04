@@ -43,7 +43,7 @@ class Position {
 	 */
 	private boolean outOfBounds(byte xPos, byte yPos) {
 		// check that the position is between 0 and 8
-		if(xPos >= 0 && xPos <= 8 && yPos >= 0 && yPos <= 8) { //** Should this be >0 instead of >=0? ** - Jack
+		if(xPos > 0 && xPos <= 8 && yPos > 0 && yPos <= 8) {
 			return false;
 		}
 		// else return true
@@ -86,7 +86,7 @@ class Square {
 	//Colour colour;
 	
 	//CONSTRUCTOR
-	public Square(Position p) { //Not exactly sure how to implement colour here
+	public Square(Position p) {
 		//set position and colour, initialize piece to null
 		this.pos = p;
 		this.piece = null;
@@ -112,6 +112,15 @@ class Square {
 	public Piece getPiece() {
 		//return piece at current square
 		return this.piece;
+	}
+	
+	/*
+	 * Sets the Piece currently on the square
+	 * @param newPiece The Piece to place on the square
+	 */
+	public void setPiece(Piece newPiece) {
+		// update the piece
+		this.piece = newPiece;
 	}
 }
 
