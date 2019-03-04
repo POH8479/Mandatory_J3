@@ -43,7 +43,7 @@ class Position {
 	 */
 	private boolean outOfBounds(byte xPos, byte yPos) {
 		// check that the position is between 0 and 8
-		if(xPos >= 0 && xPos <= 8 && yPos >= 0 && yPos <= 8) {
+		if(xPos >= 0 && xPos <= 8 && yPos >= 0 && yPos <= 8) { //** Should this be >0 instead of >=0? ** - Jack
 			return false;
 		}
 		// else return true
@@ -73,8 +73,46 @@ class Player {
 
 }
 
+/*
+ * The Square class represents a spot on the game board. 
+ * It stores the position, colour, and piece.
+ * @author Jack Rodman
+ */
 class Square {
-
+	
+	//INSTANCE VARIABLES
+	Position pos;
+	Piece piece;
+	//Colour colour;
+	
+	//CONSTRUCTOR
+	public Square(Position p) { //Not exactly sure how to implement colour here
+		//set position and colour, initialize piece to null
+		this.pos = p;
+		this.piece = null;
+		//this.colour = c;
+	}
+	
+	/*
+	 * Checks if a given square is not occupied by a piece.
+	 * @return true if empty or false if occupied
+	 */
+	public boolean isEmpty() {
+		//check if piece for current position has been initialized
+		if(this.piece == null) {
+			return true;
+		}
+		return false;
+	}
+	
+	/*
+	 * Retrieves the piece occupying a square
+	 * @return Piece at square (can be null if empty)
+	 */
+	public Piece getPiece() {
+		//return piece at current square
+		return this.piece;
+	}
 }
 
 public class checkers {
