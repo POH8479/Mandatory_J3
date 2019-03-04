@@ -130,37 +130,37 @@ class Board {
 	 * This method produces a visual representation of the game board
 	 * @return A String depicting the board
 	 */
-	 public String toString() {
-		 // create a StringBuilder object and start with column numbers
-		 StringBuilder boardStr = new StringBuilder("    A B C D E F G H   <- X axis\n  +-----------------+\n");
+	public String toString() {
+	 // create a StringBuilder object and start with column numbers
+	 StringBuilder boardStr = new StringBuilder("    A B C D E F G H   <- X axis\n  +-----------------+\n");
 
-		 // loop through the board
-		 for(int r = 0 ; r < 8 ; r++) {
-			 // append the edge of the board and row number
-			 boardStr.append(r + 1);
-			 boardStr.append(" |");
-			 // append each square
-			 for(int c = 0 ; c < 8 ; c++) {
-				 boardStr.append(" ");
-				 // check if piece is at position [r][c]
-				 if(this.board[r][c].isEmpty()) {
-					 boardStr.append(" ");
-				 } else if(this.board[r][c].getPiece().getOwner().getColour().equals("Black")) {
-					 boardStr.append(1);
-				 } else if(this.board[r][c].getPiece().getOwner().getColour().equals("White")) {
-					 boardStr.append(2);
-				 }
-				 boardStr.append(" ");
-			 }
-			 // append the edge of the board and row number
-			 boardStr.append("| ");
-			 boardStr.append(r + 1);
-			 boardStr.append("\n");
-		 }
-		 boardStr.append("  +-----------------+\n    A B C D E F G H   <- X axis\n");
-
-		 return boardStr.toString();
+	 // loop through the board
+	 for(int r = 0 ; r < 8 ; r++) {
+		// append the edge of the board and row number
+		boardStr.append(r + 1);
+		boardStr.append(" |");
+		// append each square
+		for(int c = 0 ; c < 8 ; c++) {
+			boardStr.append(" ");
+			// check if piece is at position [r][c]
+			if(this.board[r][c].isEmpty()) {
+				boardStr.append(" ");
+			} else if(this.board[r][c].getPiece().getOwner().getColour().equals("Black")) {
+				boardStr.append(1);
+			} else if(this.board[r][c].getPiece().getOwner().getColour().equals("White")) {
+				boardStr.append(2);
+			}
+			boardStr.append(" ");
+		}
+		// append the edge of the board and row number
+		boardStr.append("| ");
+		boardStr.append(r + 1);
+		boardStr.append("\n");
 	 }
+	 boardStr.append("  +-----------------+\n    A B C D E F G H   <- X axis\n");
+
+	 return boardStr.toString();
+	}
 
 	/**
 	 * This method checks if a move is possible from the Position variables start to end
@@ -168,9 +168,9 @@ class Board {
 	 * @param end the position the player wants to move their piece
 	 * @return true of false
 	 */
-	 private boolean possible(Position end, Position start) {
-		 // TODO Finish this methods
-	 }
+	private boolean possible(Position end, Position start) {
+	 // TODO Finish this methods
+	}
 }
 
 /**
@@ -198,20 +198,29 @@ class Piece {
 	}
 
 	/**
-	 * This method shares the Owner of a piece and returns it to the user
-	 * @return the owner of the Piece
-	 */
-	 public Player getOwner() {
-		 return this.owner;
-	 }
+	* This method shares the Owner of a piece and returns it to the user
+	* @return the owner of the Piece
+	*/
+	public Player getOwner() {
+		return this.owner;
+	}
 
-	 /**
- 	 * This method shares the Position of a piece and returns it to the user
- 	 * @return the owner of the Piece
- 	 */
- 	 public Position getPosition() {
-		 return this.pos;
- 	 }
+	/**
+	* This method shares the Position of a piece and returns it to the user
+	* @return the owner of the Piece
+	*/
+	public Position getPosition() {
+		return this.pos;
+	}
+
+	/**
+	 *
+	 * @param pos The position to change to
+	 */
+	public void updatePosition(Position newPos) {
+		// set the new position
+		this.pos = newPos;
+	}
 }
 
 /**
@@ -240,7 +249,7 @@ class Position {
 	}
 
 	// CONSTRUCTOR 2
-	public Position(int x, int y) {
+	public Position(int x, int y) throws IllegalArgumentException {
 		// check x and y are not out of bound
 		if(outOfBounds(x, y)) {
 			throw new IllegalArgumentException();
@@ -255,9 +264,9 @@ class Position {
 	 * Checks if a Position is out of bounds
 	 * @return true or false
 	 */
-	private boolean outOfBounds(int xPos, int yPos) {
+	private boolean outOfBounds() {
 		// check that the position is between 0 and 8
-		if(xPos > 0 && xPos <= 8 && yPos > 0 && yPos <= 8) {
+		if(this.x > 0 && this.x <= 8 && this.y > 0 && this.y <= 8) {
 			return false;
 		}
 		// else return true
@@ -271,13 +280,16 @@ class Position {
 	 *
 	 * @throws IllegalArgumentException
 	 */
-	public void update(int x, int y) throws IllegalArgumentException {
+	public void update(char x, int y) throws IllegalArgumentException {
+		// store the y reference as an int for easy lookup in the board matrix
+		int intX = Character.getNumericValue(Character.toUpperCase(x) - 64);
+
 		// check x and y are not out of bound
-		if(outOfBounds(x, y)) {
+		if(outOfBounds(intX, y)) {
 			throw new IllegalArgumentException("Position coordinates Out of Bounds");
 		} else {
 			// set x and y
-			this.x = x;
+			this.x = intX;
 			this.y = y;
 		}
 	}
@@ -376,9 +388,9 @@ class BlackPlayer extends Player {
 	}
 }
 
- // Jack Has implemented this class in a separate Branch
+// Jack Has implemented this class in a separate Branch
 class Square {
-
+	// TODO merge with Jack's Branch where this class is
 }
 
 public class checkers {
@@ -386,6 +398,6 @@ public class checkers {
 	 * The main method of the program
 	 */
 	public static void main(String args[]) {
-
+		// TODO implement the main method
 	}
 }
