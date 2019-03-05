@@ -293,6 +293,7 @@ class Position {
 			this.y = y;
 		}
 	}
+}
 
 	/**
 	 * This method returns the x coordinate of the Position
@@ -317,9 +318,9 @@ class Position {
  * @author Pieter O'Hearn
  */
 abstract class Player {
-	// INSTANCE VARIABLES
-	String name;
-	int score;
+  // INSTANCE VARIABLES
+  String name;
+  int score;
 
 	// CONSTRUCTOR 1
 	public Player(String playerName) {
@@ -388,9 +389,55 @@ class BlackPlayer extends Player {
 	}
 }
 
-// Jack Has implemented this class in a separate Branch
+/*
+ * The Square class represents a spot on the game board. 
+ * It stores the position, colour, and piece.
+ * @author Jack Rodman
+ */
 class Square {
-	// TODO merge with Jack's Branch where this class is
+	
+	//INSTANCE VARIABLES
+	Position pos;
+	Piece piece;
+	//Colour colour;
+	
+	//CONSTRUCTOR
+	public Square(Position p) {
+		//set position and colour, initialize piece to null
+		this.pos = p;
+		this.piece = null;
+		//this.colour = c;
+	}
+	
+	/*
+	 * Checks if a given square is not occupied by a piece.
+	 * @return true if empty or false if occupied
+	 */
+	public boolean isEmpty() {
+		//check if piece for current position has been initialized
+		if(this.piece == null) {
+			return true;
+		}
+		return false;
+	}
+	
+	/*
+	 * Retrieves the piece occupying a square
+	 * @return Piece at square (can be null if empty)
+	 */
+	public Piece getPiece() {
+		//return piece at current square
+		return this.piece;
+	}
+	
+	/*
+	 * Sets the Piece currently on the square
+	 * @param newPiece The Piece to place on the square
+	 */
+	public void setPiece(Piece newPiece) {
+		// update the piece
+		this.piece = newPiece;
+	}
 }
 
 public class checkers {
