@@ -117,7 +117,7 @@ class Board {
 	 */
 	public void movePiece(Piece pieceToMove, Position moveTo, Player player) throws InvalidParameterException {
 		// check that the move is in the possible moves set
-		if(this.possible(moveTo, pieceToMove.getPosition())) {
+		if(this.possible(board[moveTo.x][moveTo.y], pieceToMove)) {
 			// update the board
 			this.board[pieceToMove.getPosition().getX()][pieceToMove.getPosition().getY()].setPiece(null);
 			this.board[moveTo.getX()][moveTo.getY()].setPiece(pieceToMove);
@@ -167,8 +167,43 @@ class Board {
 	 * @param end the position the player wants to move their piece
 	 * @return true of false
 	 */
-	private boolean possible(Position end, Position start) {
-	 // TODO Finish this methods
+	private boolean possible(Square moveTo, Piece pieceToMove) { //** assuming outOfBounds has already been checked? **
+		
+		//TODO check that selected piece belongs to player
+		//if(pieceToMove.getOwner() != )
+		
+		//check if desired square is empty
+		if(moveTo.isEmpty() == false) {
+			return false;
+		}
+		
+		//initialize local variables for easier comparison
+		int x_new = moveTo.pos.x;
+		int y_new = moveTo.pos.y;
+		int x_old = pieceToMove.pos.x;
+		int y_old = pieceToMove.pos.y;
+		
+		//check if desired move is forward and diagonal -- assumes white pieces start on the bottom of board
+		if(pieceToMove.owner.getColour() == "White") {
+			if(((x_new == (x_old + 1)) || (x_new == (x_old - 1))) && (y_new == y_old - 1)) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+		
+		//check if desired move is forward and diagonal -- assumes black pieces start on the top of board
+		if(pieceToMove.owner.getColour() == "Black") {
+			if(((x_new == (x_old + 1)) || (x_new == (x_old - 1))) && (y_new == y_old + 1)) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+		
+		return false;
 	}
 }
 
