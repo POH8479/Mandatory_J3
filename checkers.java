@@ -77,15 +77,15 @@ class Board {
 				Position pos = new Position(r,c);
 
 				// create a new Square for each position and make the board
-				board[r][c] = new Square(pos);
+				board[r-1][c-1] = new Square(pos);
 
 				// if the square has a piece starting on it then create one
 				if(((r == 1 || r == 3) && (c == 1 || c == 3 || c == 5 || c == 7))
 				|| (r == 2 && (c == 2 || c == 4 || c == 6 || c == 8))) {
-					board[r][c].setPiece(new Piece(black, pos));
+					board[r-1][c-1].setPiece(new Piece(black, pos));
 				} else if (((r == 7) && (c == 1 || c == 3 || c == 5 || c == 7))
 				|| ((r == 6 || r == 8) && (c == 2 || c == 4 || c == 6 || c == 8))) {
-					board[r][c].setPiece(new Piece(white, pos));
+					board[r-1][c-1].setPiece(new Piece(white, pos));
 				}
 			}
 		}
@@ -150,10 +150,9 @@ class Board {
 			} else if(this.board[r][c].getPiece().getOwner().getColour().equals("White")) {
 				boardStr.append(2);
 			}
-			boardStr.append(" ");
 		}
 		// append the edge of the board and row number
-		boardStr.append("| ");
+		boardStr.append(" | ");
 		boardStr.append(r + 1);
 		boardStr.append("\n");
 	 }
@@ -390,17 +389,17 @@ class BlackPlayer extends Player {
 }
 
 /*
- * The Square class represents a spot on the game board. 
+ * The Square class represents a spot on the game board.
  * It stores the position, colour, and piece.
  * @author Jack Rodman
  */
 class Square {
-	
+
 	//INSTANCE VARIABLES
 	Position pos;
 	Piece piece;
 	//Colour colour;
-	
+
 	//CONSTRUCTOR
 	public Square(Position p) {
 		//set position and colour, initialize piece to null
@@ -408,7 +407,7 @@ class Square {
 		this.piece = null;
 		//this.colour = c;
 	}
-	
+
 	/*
 	 * Checks if a given square is not occupied by a piece.
 	 * @return true if empty or false if occupied
@@ -420,7 +419,7 @@ class Square {
 		}
 		return false;
 	}
-	
+
 	/*
 	 * Retrieves the piece occupying a square
 	 * @return Piece at square (can be null if empty)
@@ -429,7 +428,7 @@ class Square {
 		//return piece at current square
 		return this.piece;
 	}
-	
+
 	/*
 	 * Sets the Piece currently on the square
 	 * @param newPiece The Piece to place on the square
