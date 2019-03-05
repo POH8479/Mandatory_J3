@@ -1,32 +1,255 @@
 import java.util.Scanner;
-import java.awt.Point;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.security.InvalidParameterException;
 
+/**
+ * The Game class represents a game of checkers with two players on a 8x8 board.
+ * @author Pieter O'Hearn
+ */
 class Game {
+	// INSTANCE VARIABLES
+	BlackPlayer p1;
+	WhitePlayer p2;
+	Player turn;
+	Board gameBoard;
 
+	// CONSTRUCTOR
+	public Game(BlackPlayer player1, WhitePlayer player2) {
+		// set the players and let p1 have the first turn
+		this.p1 = player1;
+		this.p2 = player2;
+		this.turn = this.p1;
+
+		// create a new gameBoard
+		gameBoard = new Board(p2,p1);
+	}
+
+	 /**
+ 	 * This method changes the Game variable turn
+ 	 */
+ 	 public void nextTurn() {
+		 // swap the turn
+		 if(this.turn.equals(this.p1)) {
+			 // if p1 then change to p2
+			 this.turn = this.p2;
+		 } else { // otherwise change to p1
+			 this.turn = this.p1;
+		 }
+ 	 }
+
+	 /**
+ 	 * This method checks that the player who's turn it is has a piece at
+	 * the given coordinates. If so it moves the Piece on the game board,
+	 * otherwise it throws an InvalidParameterException.
+	 * @param from The Position to move from
+	 * @param to The Position to move to
+ 	 */
+ 	 public void addMove(Position from, Position to) throws InvalidParameterException {
+ 		 // store the piece that is to be moves in a variable
+ 		 Piece pieceToMove = this.gameBoard.getSquare(from).getPiece();
+ 		 // check that the player has a piece
+ 		 if(pieceToMove.getOwner().equals(turn)) {
+ 			 // move Piece to position for the player who's turn it is
+ 			 gameBoard.movePiece(pieceToMove, to, turn);
+ 		 } else {
+ 			 throw new InvalidParameterException("This Position does not contain your Piece");
+ 		 }
+ 	 }
 }
 
+/**
+ * The Board class represents an 8x8 checkers board. The board starts
+ * with 24 Pieces, 12 black and 12 white.
+ * @author Pieter O'Hearn
+ */
 class Board {
+	// INSTANCE VARIABLES
+	Square[][] board;
 
+	// CONSTRUCTOR
+	public Board(WhitePlayer white, BlackPlayer black) {
+		// create the matrix
+		board = new Square[8][8];
+
+		// construct an 8x8 matrix of Squares
+		for(int r = 1; r <= 8 ; r++) {
+			for(int c = 1 ; c <= 8 ; c++) {
+				// The position of the current square
+				Position pos = new Position(r,c);
+
+				// create a new Square for each position and make the board
+				board[r][c] = new Square(pos);
+
+				// if the square has a piece starting on it then create one
+				if(((r == 1 || r == 3) && (c == 1 || c == 3 || c == 5 || c == 7))
+				|| (r == 2 && (c == 2 || c == 4 || c == 6 || c == 8))) {
+					board[r][c].setPiece(new Piece(black, pos));
+				} else if (((r == 7) && (c == 1 || c == 3 || c == 5 || c == 7))
+				|| ((r == 6 || r == 8) && (c == 2 || c == 4 || c == 6 || c == 8))) {
+					board[r][c].setPiece(new Piece(white, pos));
+				}
+			}
+		}
+	}
+
+	/**
+	 * This method returns the square at a given Position
+	 * @param pos
+	 * @return the Square at the given Position
+	 */
+	public Square getSquare(Position pos) {
+		return this.board[pos.getX()][pos.getY()];
+	}
+
+	/**
+	 * This method returns the board in its current state to the user
+	 * @return The current state of the board as a Square matrix
+	 */
+	public Square[][] currentState() {
+		return this.board;
+	}
+
+	/**
+	 * This method moves a Piece on the board. If the given piece cannot
+	 * be moved here an InvalidParameterException will be thrown.
+	 * @param pieceToMove The piece to move
+	 * @param moveTo The position to move it to
+	 * @param player The player making the move
+	 */
+	public void movePiece(Piece pieceToMove, Position moveTo, Player player) throws InvalidParameterException {
+		// check that the move is in the possible moves set
+		if(this.possible(moveTo, pieceToMove.getPosition())) {
+			// update the board
+			this.board[pieceToMove.getPosition().getX()][pieceToMove.getPosition().getY()].setPiece(null);
+			this.board[moveTo.getX()][moveTo.getY()].setPiece(pieceToMove);
+		} else {
+			throw new InvalidParameterException("The Position you you want to move to is invalid");
+		}
+	}
+
+	/**
+	 * This method produces a visual representation of the game board
+	 * @return A String depicting the board
+	 */
+	public String toString() {
+	 // create a StringBuilder object and start with column numbers
+	 StringBuilder boardStr = new StringBuilder("    A B C D E F G H   <- X axis\n  +-----------------+\n");
+
+	 // loop through the board
+	 for(int r = 0 ; r < 8 ; r++) {
+		// append the edge of the board and row number
+		boardStr.append(r + 1);
+		boardStr.append(" |");
+		// append each square
+		for(int c = 0 ; c < 8 ; c++) {
+			boardStr.append(" ");
+			// check if piece is at position [r][c]
+			if(this.board[r][c].isEmpty()) {
+				boardStr.append(" ");
+			} else if(this.board[r][c].getPiece().getOwner().getColour().equals("Black")) {
+				boardStr.append(1);
+			} else if(this.board[r][c].getPiece().getOwner().getColour().equals("White")) {
+				boardStr.append(2);
+			}
+			boardStr.append(" ");
+		}
+		// append the edge of the board and row number
+		boardStr.append("| ");
+		boardStr.append(r + 1);
+		boardStr.append("\n");
+	 }
+	 boardStr.append("  +-----------------+\n    A B C D E F G H   <- X axis\n");
+
+	 return boardStr.toString();
+	}
+
+	/**
+	 * This method checks if a move is possible from the Position variables start to end
+	 * @param start the position of the piece to check
+	 * @param end the position the player wants to move their piece
+	 * @return true of false
+	 */
+	private boolean possible(Position end, Position start) {
+	 // TODO Finish this methods
+	}
 }
 
+/**
+ * The Piece class represents a checker piece in the checkers game. A piece
+ * has an owner and a position on the Game board or NULL if it is not in use.
+ * @author Pieter O'Hearn
+ */
 class Piece {
+	// INSTANCE VARIABLES
+	Player owner;
+	Position pos;
 
+	// CONSTRUCTOR 1
+	public Piece(Player pieceOwner, Position position) {
+		// set the owner and position variables
+		this.owner = pieceOwner;
+		this.pos = position;
+	}
+
+	// CONSTRUCTOR 2
+	public Piece(Player pieceOwner) {
+		// set owner to the given piece owner and set position to NULL
+		this.owner = pieceOwner;
+		this.pos = null;
+	}
+
+	/**
+	* This method shares the Owner of a piece and returns it to the user
+	* @return the owner of the Piece
+	*/
+	public Player getOwner() {
+		return this.owner;
+	}
+
+	/**
+	* This method shares the Position of a piece and returns it to the user
+	* @return the owner of the Piece
+	*/
+	public Position getPosition() {
+		return this.pos;
+	}
+
+	/**
+	 *
+	 * @param pos The position to change to
+	 */
+	public void updatePosition(Position newPos) {
+		// set the new position
+		this.pos = newPos;
+	}
 }
 
-/*
+/**
  * The Position class represents position of a Piece on the Game Board.
- * The class stores the position as an x and y coordinate with byte values between 0 and 8.
+ * The class stores the position as an x and y coordinate with int values between 0 and 8.
  * @author Pieter O'Hearn
  */
 class Position {
 	// INSTANCE VARIABLES
-	byte x;
-	byte y;
+	int x;
+	int y;
 
-	// CONSTRUCTOR
-	public Position(byte x, byte y) throws IllegalArgumentException {
+	// CONSTRUCTOR 1
+	public Position(char x, int y) throws IllegalArgumentException {
+		// store the y reference as an int for easy lookup in the board matrix
+		int intX = Character.getNumericValue(Character.toUpperCase(x) - 64);
+
+		// check x and y are not out of bound
+		if(outOfBounds(intX, y)) {
+			throw new IllegalArgumentException();
+		} else {
+			// set x and y
+			this.x = intX;
+			this.y = y;
+		}
+	}
+
+	// CONSTRUCTOR 2
+	public Position(int x, int y) throws IllegalArgumentException {
 		// check x and y are not out of bound
 		if(outOfBounds(x, y)) {
 			throw new IllegalArgumentException();
@@ -41,9 +264,9 @@ class Position {
 	 * Checks if a Position is out of bounds
 	 * @return true or false
 	 */
-	private boolean outOfBounds(byte xPos, byte yPos) {
+	private boolean outOfBounds() {
 		// check that the position is between 0 and 8
-		if(xPos > 0 && xPos <= 8 && yPos > 0 && yPos <= 8) {
+		if(this.x > 0 && this.x <= 8 && this.y > 0 && this.y <= 8) {
 			return false;
 		}
 		// else return true
@@ -57,20 +280,113 @@ class Position {
 	 *
 	 * @throws IllegalArgumentException
 	 */
-	public void update(byte x, byte y) throws IllegalArgumentException {
+	public void update(char x, int y) throws IllegalArgumentException {
+		// store the y reference as an int for easy lookup in the board matrix
+		int intX = Character.getNumericValue(Character.toUpperCase(x) - 64);
+
 		// check x and y are not out of bound
-		if(outOfBounds(x, y)) {
-			throw new IllegalArgumentException();
+		if(outOfBounds(intX, y)) {
+			throw new IllegalArgumentException("Position coordinates Out of Bounds");
 		} else {
 			// set x and y
-			this.x = x;
+			this.x = intX;
 			this.y = y;
 		}
 	}
 }
 
-class Player {
+	/**
+	 * This method returns the x coordinate of the Position
+	 * @return x
+	 */
+	public int getX() {
+		return this.x;
+	}
 
+	/**
+	 * This method returns the y coordinate of the Position
+	 * @return y
+	 */
+	public int getY() {
+		return this.y;
+	}
+}
+
+/**
+ * The Player class represents a Player in the checkers gameBoard.
+ * A Player has a score and a name.
+ * @author Pieter O'Hearn
+ */
+abstract class Player {
+  // INSTANCE VARIABLES
+  String name;
+  int score;
+
+	// CONSTRUCTOR 1
+	public Player(String playerName) {
+		// set name and initialise score to 0
+		this.name = playerName;
+		score = 0;
+	}
+
+	// CONSTRUCTOR 2
+	public Player() {
+		// set name to NULL and initialise score to 0
+		this.name = null;
+		score = 0;
+	}
+
+	/**
+	 * This method gets the name of the player and returns it as a String
+	 * @return The name of the player
+	 */
+	public String getName() {
+		// return the name of the player
+		return this.name;
+	}
+
+	/**
+	 * This method gets the score of the Player object
+	 * @return The score of the player
+	 */
+	 public int getScore() {
+		 // return the score
+		 return this.score;
+	 }
+
+	 /**
+	 * This is an abstract method to be implemented by its children classes,
+	 * WhitePlayer and BlackPlayer.
+	 */
+	 public abstract String getColour();
+}
+
+/**
+ * The whitePlayer class extends the Player class. It represents a checkers
+ * player whose in control of the white pieces.
+ */
+class WhitePlayer extends Player {
+	/**
+	 * This method informs the user of the colour
+	 * @return a string containing "White"
+	 */
+	public String getColour() {
+		return "White";
+	}
+}
+
+/**
+ * The blackPlayer class extends the Player class. It represents a checkers
+ * player whose in control of the black pieces.
+ */
+class BlackPlayer extends Player {
+	/**
+	 * This method informs the user of the colour
+	 * @return a string containing "Black"
+	 */
+	public String getColour() {
+		return "Black";
+	}
 }
 
 /*
@@ -126,226 +442,9 @@ class Square {
 
 public class checkers {
 	/**
-	 * This method updates the board by moving the given piece and removing
-	 * any opposition pieces in the case of a jump.
-	 * @param current	- The current position the piece is at
-	 * @param moveTo	- The position to move to
-	 * @param player	- the player who's turn it is
-	 * @param score		- the game score
-	 * @param board		- the current state of the board
+	 * The main method of the program
 	 */
-	private static void move(Point current, Point moveTo, int player, int[] score, char[][] board) {
-		// check if the move jumps any piece's or not
-		if(Math.abs(moveTo.y-current.y) == 1) {
-			// if not, move the piece the one spot to the moveTo Point
-			board[current.y+2][(current.x*2)+3] = ' ';
-			board[moveTo.y+2][(moveTo.x*2)+3] = (char) (player + 48);
-		} // if a jump has occurred
-		else {
-			// store the x and y direction in variables
-			int yDirection = (player==1) ? 1 : -1;
-			int xDirection = (moveTo.x-current.x > 0) ? 1 : -1;;
-
-			// for every piece jumped, delete it from the board
-			for(int i = 0 ; i <= Math.abs(moveTo.y-current.y) ; i++) {
-				board[(current.y+(yDirection*i))+2][((current.x+(xDirection*i))*2)+3] = ' ';
-				// deduct 1 from the score
-				score[player-1]--;
-			}
-			//move the piece to the moveTo Point
-			board[moveTo.y+2][(moveTo.x*2)+3] = (char) (player + 48);
-		}
+	public static void main(String args[]) {
+		// TODO implement the main method
 	}
-
-	/**
-	 * This method returns all possible moves for a given player in a given position.
-	 * @param pos - the position of the piece to be moved
-	 * @param player - the player who's piece it is
-	 * @param board - the current state of the board
-	 * @return A LinkedList of all possible coordinates the piece can move to
-	 */
-	private static Queue<Point> possibles(Point pos, int player, char[][] board) {
-		// create variables for the opponent and direction
-		int opponent = (player==1) ? 2 : 1;
-		int direction = (player==1) ? 1 : -1;
-
-		// create a Linked List for the coordinates of possible moves
-		Queue<Point> possibles = new LinkedList<Point>();
-
-		// create two points for the two diagonals
-		Point left = new Point(pos.x+direction,pos.y+direction);
-		Point right = new Point(pos.x-direction,pos.y+direction);
-
-		// LEFT
-		// if there is a left diagonal
-		if(!outOfBounds(left)) {
-			// if Empty
-			if(board[left.y+2][(left.x*2)+3] == ' ') {
-				// add the left diagonal to the list
-				possibles.add(left);
-			}
-			// check if the left diagonal is the oppositions piece and that a left Jump is possible
-			else if((int) board[left.y+2][(left.x*2)+3] - 48 == opponent && board[left.y+2+direction][(left.x*2)+3+direction] == ' ') {
-				// add leftJump to possibles
-				Point leftJump = new Point(left.x+direction, left.y+direction);
-				possibles.add(leftJump);
-			}
-		}
-
-		// RIGHT
-		// if there is a right diagonal
-		if(!outOfBounds(right)) {
-			// if Empty
-			if(board[right.y+2][(right.x*2)+3] == ' ') {
-				// add the left diagonal to the list
-				possibles.add(right);
-			}
-			// check if the right diagonal is the oppositions piece and that a right Jump is possible
-			else if((int) board[right.y+2][(right.x*2)+3] - 48 == opponent && board[right.y+2+direction][(right.x*2)+3-direction] == ' ') {
-				// add rightJump to possibles
-				Point rightJump = new Point(right.x-direction, right.y+direction);
-				possibles.add(rightJump);
-			}
-		}
-
-		// return the list of possible moves
-		return possibles;
-	}
-
-	/**
-	 * This Method prints the board that is provided
-	 * @param board - the current state of the board
-	 */
-	private static void printBoard(char[][] board) {
-		// loop through the array and print each line
-		for(char[] line : board) {
-			System.out.println(String.valueOf(line));
-		}
-	}
-
-	/**
-	 * This method verifies that a player has a piece at the coordinates they have entered.
-	 * @param pos - The coordinates to check
-	 * @param player - The player to check
-	 * @param board - the current state of the board
-	 * @return True or False
-	 */
-	private static boolean verifyPiece(Point pos, int player, char[][] board) {
-		// if the player has a piece at these coordinates, return true
-		if((int) board[pos.y+2][(pos.x*2)+3] - 48 == player) {
-			return true;
-		}
-		// otherwise return false
-		return false;
-	}
-
-	/**
-	 * This method checks if the coordinates given are in the bounds of the board.
-	 * @param pos - the coordinates to check
-	 * @return true or false
-	 */
-	private static boolean outOfBounds(Point pos) {
-		// if out of bounds return true
-		if(pos.x > 7 || pos.x < 0 ||  pos.y > 7 || pos.y < 0) {
-			return true;
-		}
-		// otherwise return false
-		return false;
-	}
-
-	/**
-	 * This method checks that the entered move is valid for the player.
-	 * @param currentPos - The coordinates of the current position
-	 * @param newPos - The coordinates of the position to move to
-	 * @param player - The player who's turn it is
-	 * @param board - the current state of the board
-	 * @return true or false
-	 */
-	private static boolean isValid(Point currentPos, Point newPos, int player, char[][] board) {
-		// check if the player has a piece at these coordinates
-		if(!verifyPiece(currentPos, player, board)) {
-			return false;
-		}
-		// check the coordinates of their new position are in bounds
-		if(outOfBounds(newPos)) {
-			return false;
-		}
-		// check that the move is in the possible moves set
-		for(Point move : possibles(currentPos, player, board)) {
-			if(newPos.equals(move)) {
-				return true;
-			}
-		}
-		// otherwise return false
-		return false;
-	}
-
-	/**
-	 * This is the main method for the Checker board game.
-	 * @param args - command line arguments
-	 */
-	public static void main(String[] args) {
-		// Create a new board
-		char[][] board = new char[][] {
-				"   0 1 2 3 4 5 6 7   <- X axis".toCharArray(),
-				"  +----------------+".toCharArray(),
-				"0 |  1   1   1   1 |".toCharArray(),
-				"1 |1   1   1   1   |".toCharArray(),
-				"2 |  1   1   1   1 |".toCharArray(),
-				"3 |                |".toCharArray(),
-				"4 |                |".toCharArray(),
-				"5 |2   2   2   2   |".toCharArray(),
-				"6 |  2   2   2   2 |".toCharArray(),
-				"7 |2   2   2   2   |".toCharArray(),
-				"  +----------------+".toCharArray(),
-				"   0 1 2 3 4 5 6 7  ".toCharArray()};
-
-		// keep the score, turn and positions as variables
-		int turn = 1;
-		int [] score = {12,12};
-		Point currentPos = new Point();
-		Point newPos = new Point();
-
-		// Open a Scanner
-		Scanner s = new Scanner(System.in);
-
-		// while there is no winner keep playing
-		while(score[0] > 0 && score[1] > 0) {
-			// print the board
-			printBoard(board);
-
-			// print message and receive coordinates
-			System.out.format("\nTurn of player no. %d\nCoordinate of piece to move\n  Enter X:  ", turn);
-			currentPos.x = s.nextInt();
-			System.out.print("  Enter Y:  ");
-			currentPos.y = s.nextInt();
-
-			System.out.format("\nCoordinate of new position\n  Enter X:  ", turn);
-			newPos.x = s.nextInt();
-			System.out.print("  Enter Y:  ");
-			newPos.y = s.nextInt();
-
-			// check if move is Valid
-			if(!isValid(currentPos, newPos, turn, board)) {
-				System.out.print("Invalid Coordinates entered. Game Over!\n");
-				break;
-			}
-
-			// move the piece
-			move(currentPos, newPos, turn, score, board);
-			System.out.println("Piece moved!\n");
-
-			// change turns
-			turn = (turn == 1) ? 2 : 1;
-		}
-		// Print a winning message
-		if(score[0]==0) {
-			System.out.println("Player 1 Wins!!!!");
-		} else {
-			System.out.println("Player 2 Wins!!!!");
-		}
-		// close the Scanner s
-		s.close();
-	}
-
 }
