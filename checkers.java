@@ -17,7 +17,7 @@ class Game {
 		// set the players and let p1 have the first turn
 		this.p1 = player1;
 		this.p2 = player2;
-		this.turn = this.p1;
+		this.turn = this.p2;
 
 		// create a new gameBoard
 		gameBoard = new Board(p2,p1);
@@ -26,7 +26,10 @@ class Game {
 	 /**
  	 * This method changes the Game variable turn
  	 */
- 	 public void nextTurn() {
+ 	 public String nextTurn() {
+		 // make a string with the players name and the current board
+		 String msg = String.format("%s it's your turn\n\n%s\n", turn.getName(), gameBoard.toString());
+
 		 // swap the turn
 		 if(this.turn.equals(this.p1)) {
 			 // if p1 then change to p2
@@ -34,6 +37,8 @@ class Game {
 		 } else { // otherwise change to p1
 			 this.turn = this.p1;
 		 }
+
+		 return msg;
  	 }
 
 	 /**
@@ -47,7 +52,7 @@ class Game {
  		 // store the piece that is to be moves in a variable
  		 Piece pieceToMove = this.gameBoard.getSquare(from).getPiece();
  		 // check that the player has a piece
- 		 if(pieceToMove.getOwner().equals(turn)) {
+ 		 if(pieceToMove != null && pieceToMove.getOwner().equals(turn)) {
  			 // move Piece to position for the player who's turn it is
  			 gameBoard.movePiece(pieceToMove, to, turn);
  		 } else {
@@ -74,7 +79,7 @@ class Board {
 		for(int r = 1; r <= 8 ; r++) {
 			for(int c = 1 ; c <= 8 ; c++) {
 				// The position of the current square
-				Position pos = new Position(r,c);
+				Position pos = new Position(c,r);
 
 				// create a new Square for each position and make the board
 				board[r-1][c-1] = new Square(pos);
@@ -117,10 +122,10 @@ class Board {
 	 */
 	public void movePiece(Piece pieceToMove, Position moveTo, Player player) throws InvalidParameterException {
 		// check that the move is in the possible moves set
-		if(this.possible(board[moveTo.x][moveTo.y], pieceToMove)) {
+		if(possible(board[moveTo.getY()][moveTo.getX()], pieceToMove)) {
 			// update the board
-			this.board[pieceToMove.getPosition().getX()][pieceToMove.getPosition().getY()].setPiece(null);
-			this.board[moveTo.getX()][moveTo.getY()].setPiece(pieceToMove);
+			this.board[pieceToMove.getPosition().getY()][pieceToMove.getPosition().getX()].setPiece(null);
+			this.board[moveTo.getY()][moveTo.getX()].setPiece(pieceToMove);
 		} else {
 			throw new InvalidParameterException("The Position you you want to move to is invalid");
 		}
@@ -132,7 +137,7 @@ class Board {
 	 */
 	public String toString() {
 	 // create a StringBuilder object and start with column numbers
-	 StringBuilder boardStr = new StringBuilder("    A B C D E F G H   <- X axis\n  +-----------------+\n");
+	 StringBuilder boardStr = new StringBuilder("    1 2 3 4 5 6 7 8   <- X axis\n  +-----------------+\n");
 
 	 // loop through the board
 	 for(int r = 0 ; r < 8 ; r++) {
@@ -146,9 +151,9 @@ class Board {
 			if(this.board[r][c].isEmpty()) {
 				boardStr.append(" ");
 			} else if(this.board[r][c].getPiece().getOwner().getColour().equals("Black")) {
-				boardStr.append(1);
+				boardStr.append("b");
 			} else if(this.board[r][c].getPiece().getOwner().getColour().equals("White")) {
-				boardStr.append(2);
+				boardStr.append("w");
 			}
 		}
 		// append the edge of the board and row number
@@ -156,7 +161,7 @@ class Board {
 		boardStr.append(r + 1);
 		boardStr.append("\n");
 	 }
-	 boardStr.append("  +-----------------+\n    A B C D E F G H   <- X axis\n");
+	 boardStr.append("  +-----------------+\n    1 2 3 4 5 6 7 8   <- X axis\n");
 
 	 return boardStr.toString();
 	}
@@ -168,41 +173,24 @@ class Board {
 	 * @return true of false
 	 */
 	private boolean possible(Square moveTo, Piece pieceToMove) { //** assuming outOfBounds has already been checked? **
-		
-		//TODO check that selected piece belongs to player
-		//if(pieceToMove.getOwner() != )
-		
+
 		//check if desired square is empty
-		if(moveTo.isEmpty() == false) {
-			return false;
-		}
-		
-		//initialize local variables for easier comparison
-		int x_new = moveTo.pos.x;
-		int y_new = moveTo.pos.y;
-		int x_old = pieceToMove.pos.x;
-		int y_old = pieceToMove.pos.y;
-		
-		//check if desired move is forward and diagonal -- assumes white pieces start on the bottom of board
-		if(pieceToMove.owner.getColour() == "White") {
-			if(((x_new == (x_old + 1)) || (x_new == (x_old - 1))) && (y_new == y_old - 1)) {
+		if(moveTo.isEmpty()) {
+			//initialize local variables for easier comparison
+			int x_new = moveTo.getPosition().getX();
+			int y_new = moveTo.getPosition().getY();
+			int x_old = pieceToMove.getPosition().getX();
+			int y_old = pieceToMove.getPosition().getY();
+
+			//check if desired move is forward and diagonal -- assumes white pieces start on the bottom of board
+			if(pieceToMove.getOwner().getColour().equals("White") && (((x_new == (x_old + 1)) || (x_new == (x_old - 1))) && (y_new == y_old - 1))) {
+				return true;
+			} //check if desired move is forward and diagonal -- assumes black pieces start on the top of board
+			else if(pieceToMove.getOwner().getColour().equals("Black") && (((x_new == (x_old + 1)) || (x_new == (x_old - 1))) && (y_new == y_old + 1))) {
 				return true;
 			}
-			else {
-				return false;
-			}
 		}
-		
-		//check if desired move is forward and diagonal -- assumes black pieces start on the top of board
-		if(pieceToMove.owner.getColour() == "Black") {
-			if(((x_new == (x_old + 1)) || (x_new == (x_old - 1))) && (y_new == y_old + 1)) {
-				return true;
-			}
-			else {
-				return false;
-			}
-		}
-		
+		// else return false
 		return false;
 	}
 }
@@ -267,30 +255,15 @@ class Position {
 	int x;
 	int y;
 
-	// CONSTRUCTOR 1
-	public Position(char x, int y) throws IllegalArgumentException {
-		// store the y reference as an int for easy lookup in the board matrix
-		int intX = Character.getNumericValue(Character.toUpperCase(x) - 64);
-
-		// check x and y are not out of bound
-		if(outOfBounds(intX, y)) {
-			throw new IllegalArgumentException();
-		} else {
-			// set x and y
-			this.x = intX;
-			this.y = y;
-		}
-	}
-
-	// CONSTRUCTOR 2
+	// CONSTRUCTOR
 	public Position(int x, int y) throws IllegalArgumentException {
 		// check x and y are not out of bound
 		if(outOfBounds(x, y)) {
 			throw new IllegalArgumentException();
 		} else {
 			// set x and y
-			this.x = x;
-			this.y = y;
+			this.x = x-1;
+			this.y = y-1;
 		}
 	}
 
@@ -298,9 +271,9 @@ class Position {
 	 * Checks if a Position is out of bounds
 	 * @return true or false
 	 */
-	private boolean outOfBounds() {
+	private boolean outOfBounds(int newX, int newY) {
 		// check that the position is between 0 and 8
-		if(this.x > 0 && this.x <= 8 && this.y > 0 && this.y <= 8) {
+		if(newX > 0 && newX <= 8 && newY > 0 && newY <= 8) {
 			return false;
 		}
 		// else return true
@@ -314,20 +287,16 @@ class Position {
 	 *
 	 * @throws IllegalArgumentException
 	 */
-	public void update(char x, int y) throws IllegalArgumentException {
-		// store the y reference as an int for easy lookup in the board matrix
-		int intX = Character.getNumericValue(Character.toUpperCase(x) - 64);
-
+	public void update(int x, int y) throws IllegalArgumentException {
 		// check x and y are not out of bound
-		if(outOfBounds(intX, y)) {
+		if(outOfBounds(x, y)) {
 			throw new IllegalArgumentException("Position coordinates Out of Bounds");
 		} else {
 			// set x and y
-			this.x = intX;
+			this.x = x;
 			this.y = y;
 		}
 	}
-}
 
 	/**
 	 * This method returns the x coordinate of the Position
@@ -400,6 +369,12 @@ abstract class Player {
  * player whose in control of the white pieces.
  */
 class WhitePlayer extends Player {
+
+	// CONSTRUCTOR
+	public WhitePlayer(String name) {
+		super(name);
+	}
+
 	/**
 	 * This method informs the user of the colour
 	 * @return a string containing "White"
@@ -414,6 +389,12 @@ class WhitePlayer extends Player {
  * player whose in control of the black pieces.
  */
 class BlackPlayer extends Player {
+
+	// CONSTRUCTOR
+	public BlackPlayer(String name) {
+		super(name);
+	}
+
 	/**
 	 * This method informs the user of the colour
 	 * @return a string containing "Black"
@@ -441,6 +422,14 @@ class Square {
 		this.pos = p;
 		this.piece = null;
 		//this.colour = c;
+	}
+
+	/**
+	 * get the position of the Square
+	 * @return the position
+	 */
+	public Position getPosition() {
+		return this.pos;
 	}
 
 	/*
@@ -479,6 +468,54 @@ public class checkers {
 	 * The main method of the program
 	 */
 	public static void main(String args[]) {
-		// TODO implement the main method
+		// initialise a Scanner
+		Scanner scan = new Scanner(System.in);
+
+		// Ask the user for the Players names
+		System.out.println("What is the name of Player 1?");
+		String name1 = scan.nextLine();
+		BlackPlayer p1 = new BlackPlayer(name1);
+		System.out.println(String.format("%s you are Black\n", p1.getName()));
+
+		System.out.println("What is the name of Player 2?");
+		String name2 = scan.nextLine();
+		WhitePlayer p2 = new WhitePlayer(name2);
+		System.out.println(String.format("%s you are White\n", p2.getName()));
+
+		// create a new game
+		Game checkers = new Game(p1,p2);
+
+		// print a starting  message and create x and y variables
+		System.out.println("Lets Start!! Enter the coordinates of the piece you wish to move and then the position you wish to move it to, when prompted.\n");
+		int tempX = -1;
+		int tempY = -1;
+		Position from = null;
+		Position to = null;
+
+		// while there is no winner
+		while(true) {
+			// print the board and player
+			System.out.println(checkers.nextTurn());
+
+			// ask what piece to move
+			System.out.print("Move Piece at:\n    Enter x coordinate: ");
+			tempX = scan.nextInt();
+			System.out.print("\n    Enter y coordinate: ");
+			tempY = scan.nextInt();
+			from = new Position(tempX, tempY);
+
+			// ask what position to move the piece
+			System.out.print("Move Piece to Position:\n    Enter x coordinate: ");
+			tempX = scan.nextInt();
+			System.out.print("\n    Enter y coordinate: ");
+			tempY = scan.nextInt();
+			to = new Position(tempX, tempY);
+
+			// perform the move
+			checkers.addMove(from, to);
+		}
+
+		// close the scanner
+		//scan.close();
 	}
 }
