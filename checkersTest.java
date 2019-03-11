@@ -23,11 +23,11 @@ public class checkersTest {
 	/**
 	 * Testing that a player cannot successfully move a piece out of bounds.
 	 */
-	@Test (expected = IllegalArgumentException.class)
+	@Test 
 	public void testOutOfBounds() {
 		
 		//Initialize an in-bound position to use as reference object to call outOfBounds() for destination coordinates
-		Position inBounds = new Position('a', 1);
+		Position inBounds = new Position(1, 1);
 		
 		//Testing an in-bounds position -> outOfBounds should return False
 		boolean test1 = inBounds.outOfBounds(3, 5);
@@ -55,7 +55,7 @@ public class checkersTest {
 	 * Testing that a player cannot successfully play an invalid move. e.g.
 	 * placing a piece on another coloured square.
 	 */
-	@Test (expected = IllegalArgumentException.class)
+	@Test
 	public void testValidMoves() {
 		
 		//initialize a game for testing purposes
@@ -63,17 +63,50 @@ public class checkersTest {
 		WhitePlayer p2 = new WhitePlayer("Jack");
 		Game game = new Game(p1, p2);
 		
-		
 		//initialize parameters for testing possible() for a White Player
-		Position current = new Position('d', 6);
+		Position current = new Position(4, 6);
 		Piece base = new Piece(p2, current); //Piece to be passed into possible()
 		
 		//Test destination square which is valid
-		Position next1 = new Position('e', 5);
+		Position next1 = new Position(5, 5);
 		Square dest1 = new Square(next1); //destination square to be passed into possible()
 		boolean test1 = game.gameBoard.possible(dest1, base);
 		assertTrue("Valid moves test failed", test1);
 		
+		//Test destination square which is invalid (backward)
+		Position next2 = new Position(5, 7);
+		Square dest2 = new Square(next2); //destination square to be passed into possible()
+		boolean test2 = game.gameBoard.possible(dest2, base);
+		assertFalse("Valid moves test failed", test2);
+		
+		//Test destination square which is invalid (non-diagonal)
+		Position next3 = new Position(4, 5);
+		Square dest3 = new Square(next3); //destination square to be passed into possible()
+		boolean test3 = game.gameBoard.possible(dest3, base);
+		assertFalse("Valid moves test failed", test3);
+		
+		
+		//initialize parameters for testing possible() for a Black Player
+		Position currentBl = new Position(7, 3);
+		Piece baseBl = new Piece(p1, currentBl); //Piece to be passed into possible()
+
+		//Test destination square which is valid
+		Position nextBl1 = new Position(6, 4);
+		Square destBl1 = new Square(nextBl1); //destination square to be passed into possible()
+		boolean testBl1 = game.gameBoard.possible(destBl1, baseBl);
+		assertTrue("Valid moves test failed", testBl1);
+
+		//Test destination square which is invalid (backward)
+		Position nextBl2 = new Position(8, 2);
+		Square destBl2 = new Square(nextBl2); //destination square to be passed into possible()
+		boolean testBl2 = game.gameBoard.possible(destBl2, baseBl);
+		assertFalse("Valid moves test failed", testBl2);
+
+		//Test destination square which is invalid (non-diagonal)
+		Position nextBl3 = new Position(7, 4);
+		Square destBl3 = new Square(nextBl3); //destination square to be passed into possible()
+		boolean testBl3 = game.gameBoard.possible(destBl3, baseBl);
+		assertFalse("Valid moves test failed", testBl3);
 		
 	}
 
