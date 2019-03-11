@@ -7,10 +7,10 @@ import java.security.InvalidParameterException;
  */
 class Game {
 	// INSTANCE VARIABLES
-	BlackPlayer p1;
-	WhitePlayer p2;
-	Player turn;
-	Board gameBoard;
+	private BlackPlayer p1;
+	private WhitePlayer p2;
+	private Player turn;
+	private Board gameBoard;
 
 	// CONSTRUCTOR
 	public Game(BlackPlayer player1, WhitePlayer player2) {
@@ -20,45 +20,45 @@ class Game {
 		this.turn = this.p2;
 
 		// create a new gameBoard
-		gameBoard = new Board(p2,p1);
+		gameBoard = new Board(p1,p2);
 	}
 
-	 /**
- 	 * This method changes the Game variable turn
- 	 */
- 	 public String nextTurn() {
-		 // make a string with the players name and the current board
-		 String msg = String.format("%s it's your turn\n\n%s\n", turn.getName(), gameBoard.toString());
+	/**
+	 * This method changes the Game variable turn and returns a string telling the user who's turn it is
+	 */
+	public String nextTurn() {
+		// swap the turn
+		if(this.turn.equals(this.p1)) {
+			// if p1 then change to p2
+			this.turn = this.p2;
+		} else { // otherwise change to p1
+			this.turn = this.p1;
+		}
 
-		 // swap the turn
-		 if(this.turn.equals(this.p1)) {
-			 // if p1 then change to p2
-			 this.turn = this.p2;
-		 } else { // otherwise change to p1
-			 this.turn = this.p1;
-		 }
+		// make a string with the players name and the current board
+		String msg = String.format("%s it's your turn\n\n%s\n", turn.getName(), gameBoard.toString());
 
-		 return msg;
- 	 }
+		return msg;
+	}
 
-	 /**
- 	 * This method checks that the player who's turn it is has a piece at
+	/**
+	 * This method checks that the player who's turn it is has a piece at
 	 * the given coordinates. If so it moves the Piece on the game board,
 	 * otherwise it throws an InvalidParameterException.
 	 * @param from The Position to move from
 	 * @param to The Position to move to
- 	 */
- 	 public void addMove(Position from, Position to) throws InvalidParameterException {
- 		 // store the piece that is to be moves in a variable
- 		 Piece pieceToMove = this.gameBoard.getSquare(from).getPiece();
- 		 // check that the player has a piece
- 		 if(pieceToMove != null && pieceToMove.getOwner().equals(turn)) {
- 			 // move Piece to position for the player who's turn it is
- 			 gameBoard.movePiece(pieceToMove, to, turn);
- 		 } else {
- 			 throw new InvalidParameterException("This Position does not contain your Piece");
- 		 }
- 	 }
+	 */
+	public void addMove(Position from, Position to) throws InvalidParameterException {
+		// store the piece that is to be moves in a variable
+		Piece pieceToMove = this.gameBoard.getSquare(from).getPiece();
+		// check that the player has a piece
+		if(pieceToMove != null && pieceToMove.getOwner().equals(this.turn)) {
+			// move Piece to position for the player who's turn it is
+			gameBoard.movePiece(pieceToMove, to, this.turn);
+		} else {
+			throw new InvalidParameterException("This Position does not contain your Piece");
+		}
+	}
 }
 
 /**
@@ -68,10 +68,10 @@ class Game {
  */
 class Board {
 	// INSTANCE VARIABLES
-	Square[][] board;
+	private Square[][] board;
 
 	// CONSTRUCTOR
-	public Board(WhitePlayer white, BlackPlayer black) {
+	public Board(BlackPlayer black, WhitePlayer white) {
 		// create the matrix
 		board = new Square[8][8];
 
@@ -102,7 +102,7 @@ class Board {
 	 * @return the Square at the given Position
 	 */
 	public Square getSquare(Position pos) {
-		return this.board[pos.getX()][pos.getY()];
+		return this.board[pos.getY()][pos.getX()];
 	}
 
 	/**
@@ -136,11 +136,11 @@ class Board {
 	 * @return A String depicting the board
 	 */
 	public String toString() {
-	 // create a StringBuilder object and start with column numbers
-	 StringBuilder boardStr = new StringBuilder("    1 2 3 4 5 6 7 8   <- X axis\n  +-----------------+\n");
+	// create a StringBuilder object and start with column numbers
+	StringBuilder boardStr = new StringBuilder("    1 2 3 4 5 6 7 8   <- X axis\n  +-----------------+\n");
 
-	 // loop through the board
-	 for(int r = 0 ; r < 8 ; r++) {
+	// loop through the board
+	for(int r = 0 ; r < 8 ; r++) {
 		// append the edge of the board and row number
 		boardStr.append(r + 1);
 		boardStr.append(" |");
@@ -160,10 +160,10 @@ class Board {
 		boardStr.append(" | ");
 		boardStr.append(r + 1);
 		boardStr.append("\n");
-	 }
-	 boardStr.append("  +-----------------+\n    1 2 3 4 5 6 7 8   <- X axis\n");
+	}
+	boardStr.append("  +-----------------+\n    1 2 3 4 5 6 7 8   <- X axis\n");
 
-	 return boardStr.toString();
+	return boardStr.toString();
 	}
 
 	/**
@@ -172,21 +172,19 @@ class Board {
 	 * @param end the position the player wants to move their piece
 	 * @return true of false
 	 */
-	private boolean possible(Square moveTo, Piece pieceToMove) { //** assuming outOfBounds has already been checked? **
+	public boolean possible(Square moveTo, Piece pieceToMove) { //** assuming outOfBounds has already been checked? **
 
 		//check if desired square is empty
 		if(moveTo.isEmpty()) {
 			//initialize local variables for easier comparison
-			int x_new = moveTo.getPosition().getX();
-			int y_new = moveTo.getPosition().getY();
-			int x_old = pieceToMove.getPosition().getX();
-			int y_old = pieceToMove.getPosition().getY();
+			Position newPos = moveTo.getPosition();
+			Position old = pieceToMove.getPosition();
 
 			//check if desired move is forward and diagonal -- assumes white pieces start on the bottom of board
-			if(pieceToMove.getOwner().getColour().equals("White") && (((x_new == (x_old + 1)) || (x_new == (x_old - 1))) && (y_new == y_old - 1))) {
+			if(pieceToMove.getOwner().getColour().equals("White") && ((newPos.getX() == (old.getX() + 1)) || (newPos.getX() == (old.getX() - 1))) && (newPos.getY() == (old.getY() - 1))) {
 				return true;
 			} //check if desired move is forward and diagonal -- assumes black pieces start on the top of board
-			else if(pieceToMove.getOwner().getColour().equals("Black") && (((x_new == (x_old + 1)) || (x_new == (x_old - 1))) && (y_new == y_old + 1))) {
+			else if(pieceToMove.getOwner().getColour().equals("Black") && ((newPos.getX() == (old.getX() + 1)) || (newPos.getX() == (old.getX() - 1))) && (newPos.getY() == (old.getY() + 1))) {
 				return true;
 			}
 		}
@@ -202,21 +200,14 @@ class Board {
  */
 class Piece {
 	// INSTANCE VARIABLES
-	Player owner;
-	Position pos;
+	private Player owner;
+	private Position pos;
 
 	// CONSTRUCTOR 1
 	public Piece(Player pieceOwner, Position position) {
 		// set the owner and position variables
 		this.owner = pieceOwner;
 		this.pos = position;
-	}
-
-	// CONSTRUCTOR 2
-	public Piece(Player pieceOwner) {
-		// set owner to the given piece owner and set position to NULL
-		this.owner = pieceOwner;
-		this.pos = null;
 	}
 
 	/**
@@ -252,8 +243,8 @@ class Piece {
  */
 class Position {
 	// INSTANCE VARIABLES
-	int x;
-	int y;
+	private int x;
+	private int y;
 
 	// CONSTRUCTOR
 	public Position(int x, int y) throws IllegalArgumentException {
@@ -322,8 +313,8 @@ class Position {
  */
 abstract class Player {
   // INSTANCE VARIABLES
-  String name;
-  int score;
+	private  String name;
+	private  int score;
 
 	// CONSTRUCTOR 1
 	public Player(String playerName) {
@@ -352,16 +343,16 @@ abstract class Player {
 	 * This method gets the score of the Player object
 	 * @return The score of the player
 	 */
-	 public int getScore() {
-		 // return the score
-		 return this.score;
-	 }
+	public int getScore() {
+		// return the score
+		return this.score;
+	}
 
-	 /**
+	/**
 	 * This is an abstract method to be implemented by its children classes,
 	 * WhitePlayer and BlackPlayer.
 	 */
-	 public abstract String getColour();
+	public abstract String getColour();
 }
 
 /**
@@ -412,9 +403,8 @@ class BlackPlayer extends Player {
 class Square {
 
 	//INSTANCE VARIABLES
-	Position pos;
-	Piece piece;
-	//Colour colour;
+	private Position pos;
+	private Piece piece;
 
 	//CONSTRUCTOR
 	public Square(Position p) {
@@ -493,7 +483,7 @@ public class checkers {
 		Position to = null;
 
 		// while there is no winner
-		while(true) {
+		while(p1.getScore() != 12 || p2.getScore() != 12) {
 			// print the board and player
 			System.out.println(checkers.nextTurn());
 
@@ -516,6 +506,6 @@ public class checkers {
 		}
 
 		// close the scanner
-		//scan.close();
+		scan.close();
 	}
 }
