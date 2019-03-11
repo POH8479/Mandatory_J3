@@ -109,6 +109,25 @@ public class checkersTest {
 		assertFalse("Valid moves test failed", testBl3);
 		
 	}
+	
+	/**
+	 * Testing the isEmpty method to make sure empty squares can be identified
+	 */
+	@Test
+	public void testisEmpty() {
+		//initialize a game for testing
+		BlackPlayer p1 = new BlackPlayer("Pieter");
+		WhitePlayer p2 = new WhitePlayer("Jack");
+		Game game = new Game(p1, p2);
+		
+		//Test for a position that is occupied by a piece
+		Position pos1 = new Position(2, 2);
+		assertFalse("isEmpty test failed", game.gameBoard.getSquare(pos1).isEmpty());
+		//Test for a position that is not occupied by a piece
+		Position pos2 = new Position(4, 4);
+		assertTrue("isEmpty test failed", game.gameBoard.getSquare(pos2).isEmpty());
+		
+	}
 
 	/**
 	 * Testing that a player can successfully jump their opponents piece and remove it from
