@@ -111,6 +111,18 @@ public class checkersTest {
 	}
 	
 	/**
+	 * Testing that getPosition returns the correct position from a square
+	 */
+	@Test
+	public void testgetPosition() {
+		//Initialize a position and square for testing
+		Position pos = new Position(2,2);
+		Square sq = new Square(pos);
+		//Verify that getPosition returns the desired position
+		assertSame("getPosition test failed", pos, sq.getPosition());
+	}
+	
+	/**
 	 * Testing the isEmpty method to make sure empty squares can be identified
 	 */
 	@Test
