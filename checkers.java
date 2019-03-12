@@ -24,8 +24,8 @@ class Game {
 	}
 
 	/**
-	 * This method changes the Game variable turn and returns a string telling the user who's turn it is
-	 */
+ 	 * This method changes the Game variable turn and returns a string telling the user who's turn it is
+ 	 */
 	public String nextTurn() {
 		// swap the turn
 		if(this.turn.equals(this.p1)) {
@@ -136,34 +136,34 @@ class Board {
 	 * @return A String depicting the board
 	 */
 	public String toString() {
-	// create a StringBuilder object and start with column numbers
-	StringBuilder boardStr = new StringBuilder("    1 2 3 4 5 6 7 8   <- X axis\n  +-----------------+\n");
+		// create a StringBuilder object and start with column numbers
+		StringBuilder boardStr = new StringBuilder("    1 2 3 4 5 6 7 8   <- X axis\n  +-----------------+\n");
 
-	// loop through the board
-	for(int r = 0 ; r < 8 ; r++) {
-		// append the edge of the board and row number
-		boardStr.append(r + 1);
-		boardStr.append(" |");
-		// append each square
-		for(int c = 0 ; c < 8 ; c++) {
-			boardStr.append(" ");
-			// check if piece is at position [r][c]
-			if(this.board[r][c].isEmpty()) {
+		// loop through the board
+		for(int r = 0 ; r < 8 ; r++) {
+			// append the edge of the board and row number
+			boardStr.append(r + 1);
+			boardStr.append(" |");
+			// append each square
+			for(int c = 0 ; c < 8 ; c++) {
 				boardStr.append(" ");
-			} else if(this.board[r][c].getPiece().getOwner().getColour().equals("Black")) {
-				boardStr.append("b");
-			} else if(this.board[r][c].getPiece().getOwner().getColour().equals("White")) {
-				boardStr.append("w");
+				// check if piece is at position [r][c]
+				if(this.board[r][c].isEmpty()) {
+					boardStr.append(" ");
+				} else if(this.board[r][c].getPiece().getOwner().getColour().equals("Black")) {
+					boardStr.append("b");
+				} else if(this.board[r][c].getPiece().getOwner().getColour().equals("White")) {
+					boardStr.append("w");
+				}
 			}
+			// append the edge of the board and row number
+			boardStr.append(" | ");
+			boardStr.append(r + 1);
+			boardStr.append("\n");
 		}
-		// append the edge of the board and row number
-		boardStr.append(" | ");
-		boardStr.append(r + 1);
-		boardStr.append("\n");
-	}
-	boardStr.append("  +-----------------+\n    1 2 3 4 5 6 7 8   <- X axis\n");
+		boardStr.append("  +-----------------+\n    1 2 3 4 5 6 7 8   <- X axis\n");
 
-	return boardStr.toString();
+		return boardStr.toString();
 	}
 
 	/**
@@ -172,7 +172,7 @@ class Board {
 	 * @param end the position the player wants to move their piece
 	 * @return true of false
 	 */
-	public boolean possible(Square moveTo, Piece pieceToMove) { //** assuming outOfBounds has already been checked? **
+	public boolean possible(Square moveTo, Piece pieceToMove) {
 
 		//check if desired square is empty
 		if(moveTo.isEmpty()) {
@@ -190,6 +190,20 @@ class Board {
 		}
 		// else return false
 		return false;
+	}
+
+	/**
+	 * This is an overriding method that compares two Board objects.
+	 * @param board The board to compare
+	 * @return true is equal, false if not
+	 */
+	public boolean equals(Board board) {
+		// use the toString method to compare the strings
+		if(board.toString().equals(this.toString())) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 }
 
@@ -234,6 +248,20 @@ class Piece {
 		// set the new position
 		this.pos = newPos;
 	}
+
+	/**
+	 * This is an overriding method that compares two Piece objects.
+	 * @param piece The piece to compare
+	 * @return true is equal, false if not
+	 */
+	public boolean equals(Piece piece) {
+		//
+		if(piece.getOwner().equals(this.owner) && piece.getPosition().equals(this.getPosition())) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 }
 
 /**
@@ -262,7 +290,7 @@ class Position {
 	 * Checks if a Position is out of bounds
 	 * @return true or false
 	 */
-	private boolean outOfBounds(int newX, int newY) {
+	public boolean outOfBounds(int newX, int newY) {
 		// check that the position is between 0 and 8
 		if(newX > 0 && newX <= 8 && newY > 0 && newY <= 8) {
 			return false;
@@ -304,6 +332,20 @@ class Position {
 	public int getY() {
 		return this.y;
 	}
+
+	/**
+	 * This is an overriding method that compares two Position objects.
+	 * @param pos The Position to compare
+	 * @return true is equal, false if not
+	 */
+	public boolean equals(Position pos) {
+		//
+		if(pos.getX() == this.x && pos.getY() == this.y) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 }
 
 /**
@@ -312,7 +354,7 @@ class Position {
  * @author Pieter O'Hearn
  */
 abstract class Player {
-  // INSTANCE VARIABLES
+	// INSTANCE VARIABLES
 	private  String name;
 	private  int score;
 
@@ -353,6 +395,20 @@ abstract class Player {
 	 * WhitePlayer and BlackPlayer.
 	 */
 	public abstract String getColour();
+
+	/**
+	 * This is an overriding method that compares two Player objects.
+	 * @param p The player to compare
+	 * @return true is equal, false if not
+	 */
+	public boolean equals(Player p) {
+		// check the players have the same name and score
+		if(p.getName().equals(this.name) && p.getScore() == this.score) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 }
 
 /**
@@ -373,6 +429,20 @@ class WhitePlayer extends Player {
 	public String getColour() {
 		return "White";
 	}
+
+	/**
+	 * This is an overriding method that compares two WhitePlayer objects.
+	 * @param p The WhitePlayer to compare
+	 * @return true is equal, false if not
+	 */
+	public boolean equals(WhitePlayer p) {
+		// check the players have the same name and score and colour
+		if(super.equals(p) && p.getColour().equals("White")) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 }
 
 /**
@@ -392,6 +462,20 @@ class BlackPlayer extends Player {
 	 */
 	public String getColour() {
 		return "Black";
+	}
+
+	/**
+	 * This is an overriding method that compares two BlackPlayer objects.
+	 * @param p The BlackPlayer to compare
+	 * @return true is equal, false if not
+	 */
+	public boolean equals(BlackPlayer p) {
+		// check the players have the same name and score and colour
+		if(super.equals(p) && p.getColour().equals("Black")) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 }
 
